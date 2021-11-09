@@ -53,11 +53,15 @@
       </div>
 
       <h2>Паспортные данные</h2>
-      <div class="row">
+      <div class="row" v-click-outside="hideNationalityDropdown">
         <label for="nationality" class="block">Гражданство</label>
-        <input id="nationality" v-model="formData.nationality" />
+        <input
+          id="nationality"
+          v-model="formData.nationality"
+          @focus="isNationalityOpen = true"
+        />
 
-        <div class="selector_dropdown">
+        <div v-if="isNationalityOpen" class="selector_dropdown">
           <ul>
             <li
               v-for="citizenship in citizenships"
@@ -70,13 +74,105 @@
         </div>
       </div>
 
+      <div v-if="isRussianNationality">
+        <div class="row">
+          <label for="russianPassportSeries" class="block"
+            >Серия паспорта</label
+          >
+          <input
+            id="russianPassportSeries"
+            v-model="formData.russianPassport.passportSeries"
+          />
+        </div>
+
+        <div class="row">
+          <label for="russianPassportNumber" class="block"
+            >Номер паспорта</label
+          >
+          <input
+            id="russianPassportNumber"
+            v-model="formData.russianPassport.passportNumber"
+          />
+        </div>
+
+        <div class="row">
+          <label for="russianPassportNumber" class="block">Дата выдачи</label>
+          <input
+            id="russianPassportIssueDate"
+            v-model="formData.russianPassport.issueDate"
+          />
+        </div>
+      </div>
+
+      <div v-else-if="isForeignNationality">
+        <div class="row">
+          <label for="foreignPassportLastName" class="block"
+            >Фамилия на латиннице</label
+          >
+          <input
+            id="foreignPassportFirstName"
+            v-model="formData.foreignPassport.latinLastName"
+          />
+        </div>
+
+        <div class="row">
+          <label for="foreignPassportFirstName" class="block"
+            >Имя на латиннице</label
+          >
+          <input
+            id="foreignPassportFirstName"
+            v-model="formData.foreignPassport.latinFirstName"
+          />
+        </div>
+
+        <div class="row">
+          <label for="foreignPassportNumber" class="block"
+            >Номер паспорта</label
+          >
+          <input
+            id="foreignPassportNumber"
+            v-model="formData.foreignPassport.passportNumber"
+          />
+        </div>
+
+        <div class="row">
+          <label for="foreignPassportCountry" class="block"
+            >Страна выдачи</label
+          >
+          <select id="foreignPassportCountry">
+            <option
+              v-for="citizenship in citizenships"
+              :key="citizenship.id"
+              value="citizenship.nationality"
+            >
+              {{ citizenship.nationality }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="foreignPassportType" class="block">Тип паспорта</label>
+          <select name="foreignPassportType" id="foreignPassportType">
+            <option
+              v-for="passportType in passportTypes"
+              :key="passportType.id"
+              value="passportType.type"
+            >
+              {{ passportType.type }}
+            </option>
+          </select>
+        </div>
+      </div>
+
       <button>Отправить</button>
     </form>
   </div>
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
 import citizenships from '@/assets/data/citizenships.json';
+import passportTypes from '@/assets/data/passport-types.json';
 
 export default {
   data() {
@@ -89,14 +185,43 @@ export default {
         email: '',
         gender: '',
         nationality: '',
+        russianPassport: {
+          passportSeries: '',
+          passportNumber: '',
+          issueDate: '',
+        },
+        foreignPassport: {
+          latinLastName: '',
+          latinFirstName: '',
+          passportNumber: '',
+          passportCountry: '',
+          passportType: '',
+        },
       },
+      isNationalityOpen: false,
       citizenships,
+      passportTypes,
     };
+  },
+  computed: {
+    isRussianNationality() {
+      return this.formData.nationality === 'Russia';
+    },
+    isForeignNationality() {
+      return !this.isRussianNationality && this.formData.nationality.length > 0;
+    },
   },
   methods: {
     onCitizenshipClicked(selectedCitizenship) {
       this.formData.nationality = selectedCitizenship.nationality;
+      this.hideNationalityDropdown();
     },
+    hideNationalityDropdown() {
+      this.isNationalityOpen = false;
+    },
+  },
+  directives: {
+    ClickOutside,
   },
 };
 </script>
@@ -107,5 +232,30 @@ export default {
 }
 .block {
   display: block;
+}
+
+.selector_dropdown {
+  width: 200px;
+  max-height: 300px;
+  overflow-y: scroll;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.selector_dropdown ul {
+  padding: 0;
+  margin: 0;
+}
+
+.selector_dropdown li {
+  display: block;
+  margin: 0;
+  padding: 3px;
+}
+
+.selector_dropdown li:hover {
+  background: #d3e1eb;
 }
 </style>
