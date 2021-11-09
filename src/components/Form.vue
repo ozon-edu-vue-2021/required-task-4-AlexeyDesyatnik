@@ -41,7 +41,7 @@
           value="male"
           v-model="formData.gender"
         />
-        <label for="gender_male">Мужской</label>
+        <label for="gender_male"> Мужской </label>
         <input
           type="radio"
           name="gender"
@@ -49,13 +49,25 @@
           value="female"
           v-model="formData.gender"
         />
-        <label for="gender_female">Женский</label>
+        <label for="gender_female"> Женский </label>
       </div>
 
       <h2>Паспортные данные</h2>
       <div class="row">
         <label for="nationality" class="block">Гражданство</label>
-        <input id="nationality" />
+        <input id="nationality" v-model="formData.nationality" />
+
+        <div class="selector_dropdown">
+          <ul>
+            <li
+              v-for="citizenship in citizenships"
+              :key="citizenship.id"
+              @click="onCitizenshipClicked(citizenship)"
+            >
+              {{ citizenship.nationality }}
+            </li>
+          </ul>
+        </div>
       </div>
 
       <button>Отправить</button>
@@ -64,6 +76,8 @@
 </template>
 
 <script>
+import citizenships from '@/assets/data/citizenships.json';
+
 export default {
   data() {
     return {
@@ -76,9 +90,14 @@ export default {
         gender: '',
         nationality: '',
       },
+      citizenships,
     };
   },
-  methods: {},
+  methods: {
+    onCitizenshipClicked(selectedCitizenship) {
+      this.formData.nationality = selectedCitizenship.nationality;
+    },
+  },
 };
 </script>
 
