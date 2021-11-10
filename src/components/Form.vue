@@ -58,14 +58,14 @@
         <label for="nationality" class="block">Гражданство</label>
         <input
           id="nationality"
-          v-model="formData.nationality"
-          @focus="isNationalityOpen = true"
+          v-model="nationalityFilterText"
+          @focus="onNationalityFilterFocus"
         />
 
         <div v-if="isNationalityOpen" class="selector_dropdown">
           <ul>
             <li
-              v-for="citizenship in citizenships"
+              v-for="citizenship in filteredCitizenships"
               :key="citizenship.id"
               @click="onCitizenshipClicked(citizenship)"
             >
@@ -100,6 +100,7 @@
           <label for="russianPassportNumber" class="block">Дата выдачи</label>
           <input
             id="russianPassportIssueDate"
+            placeholder="дд.мм.гггг"
             v-model="formData.russianPassport.issueDate"
           />
         </div>
@@ -235,11 +236,17 @@ export default {
         },
       },
       isNationalityOpen: false,
+      nationalityFilterText: '',
       citizenships,
       passportTypes,
     };
   },
   computed: {
+    filteredCitizenships() {
+      return this.citizenships.filter((it) =>
+        it.nationality.includes(this.nationalityFilterText)
+      );
+    },
     isRussianNationality() {
       return this.formData.nationality === 'Russia';
     },
@@ -251,8 +258,13 @@ export default {
     },
   },
   methods: {
+    onNationalityFilterFocus() {
+      this.nationalityFilterText = '';
+      this.isNationalityOpen = true;
+    },
     onCitizenshipClicked(selectedCitizenship) {
       this.formData.nationality = selectedCitizenship.nationality;
+      this.nationalityFilterText = this.formData.nationality;
       this.hideNationalityDropdown();
     },
     hideNationalityDropdown() {
