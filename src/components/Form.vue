@@ -1,7 +1,7 @@
 <template>
   <div class="form">
     {{ formData }}
-    <form action="">
+    <form action="" autocomplete="false" @submit.prevent="onFormSubmit">
       <h2>Личные данные</h2>
       <div class="row">
         <label for="lastName" class="block">Фамилия</label>
@@ -257,6 +257,10 @@ export default {
     },
     hideNationalityDropdown() {
       this.isNationalityOpen = false;
+    },
+    onFormSubmit() {
+      const prettifiedData = JSON.stringify(this.formData, null, 2);
+      console.log(prettifiedData);
     },
   },
   directives: {
