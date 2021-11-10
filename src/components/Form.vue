@@ -1,6 +1,5 @@
 <template>
   <div class="form">
-    {{ formData }}
     <form action="" autocomplete="false" @submit.prevent="onFormSubmit">
       <h2>Личные данные</h2>
       <div class="row">
@@ -187,9 +186,9 @@
         <label for="nameWasChanged"> Да </label>
       </div>
       <div class="row" v-if="formData.wasNameChanged">
-        <label class="block" for="previousLastName">Фамилия</label>
+        <label class="block" for="previousLastName">Предыдущая фамилия</label>
         <input id="previousLastName" v-model="formData.previousName.lastName" />
-        <label class="block" for="previousFirstName">Имя</label>
+        <label class="block" for="previousFirstName">Предыдущее имя</label>
         <input
           id="previousLastName"
           v-model="formData.previousName.firstName"
@@ -202,6 +201,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import ClickOutside from 'vue-click-outside';
 import citizenships from '@/assets/data/citizenships.json';
 import passportTypes from '@/assets/data/passport-types.json';
@@ -235,29 +235,28 @@ export default {
           firstName: '',
         },
       },
-      isNationalityOpen: false,
-      nationalityFilterText: '',
       citizenships,
       passportTypes,
+      isNationalityOpen: false,
+      nationalityFilterText: '',
+      filteredCitizenships: citizenships,
+      debouncedFilterCitizenships: null,
     };
   },
   computed: {
-    filteredCitizenships() {
-      return this.citizenships.filter((it) =>
-        it.nationality.includes(this.nationalityFilterText)
-      );
-    },
     isRussianNationality() {
       return this.formData.nationality === 'Russia';
     },
     isForeignNationality() {
       return !this.isRussianNationality && this.formData.nationality.length > 0;
     },
-    wasNameChanged() {
-      return this.formData.wasNameChanged;
-    },
   },
   methods: {
+    filterCitizenships(filterText) {
+      this.filteredCitizenships = this.citizenships.filter((it) =>
+        it.nationality.toLowerCase().includes(filterText)
+      );
+    },
     onNationalityFilterFocus() {
       this.nationalityFilterText = '';
       this.isNationalityOpen = true;
@@ -275,8 +274,16 @@ export default {
       console.log(prettifiedData);
     },
   },
+  watch: {
+    nationalityFilterText(newValue) {
+      this.debouncedFilterCitizenships(newValue);
+    },
+  },
   directives: {
     ClickOutside,
+  },
+  created() {
+    this.debouncedFilterCitizenships = _.debounce(this.filterCitizenships, 500);
   },
 };
 </script>
