@@ -52,6 +52,7 @@
         <label for="gender_female"> Женский </label>
       </div>
 
+      <!---------  PASSPORT INFORMATION --------->
       <h2>Паспортные данные</h2>
       <div class="row" v-click-outside="hideNationalityDropdown">
         <label for="nationality" class="block">Гражданство</label>
@@ -164,6 +165,36 @@
         </div>
       </div>
 
+      <!---------  NAME CHANGE INFORMATION --------->
+      <h2>Меняли ли фамилию или имя?</h2>
+      <div class="row">
+        <input
+          type="radio"
+          name="wasNameChanged"
+          id="nameWasNotChanged"
+          :value="false"
+          v-model="formData.wasNameChanged"
+        />
+        <label for="nameWasNotChanged"> Нет </label>
+        <input
+          type="radio"
+          name="wasNameChanged"
+          id="nameWasChanged"
+          :value="true"
+          v-model="formData.wasNameChanged"
+        />
+        <label for="nameWasChanged"> Да </label>
+      </div>
+      <div class="row" v-if="formData.wasNameChanged">
+        <label class="block" for="previousLastName">Фамилия</label>
+        <input id="previousLastName" v-model="formData.previousName.lastName" />
+        <label class="block" for="previousFirstName">Имя</label>
+        <input
+          id="previousLastName"
+          v-model="formData.previousName.firstName"
+        />
+      </div>
+
       <button>Отправить</button>
     </form>
   </div>
@@ -197,6 +228,11 @@ export default {
           passportCountry: '',
           passportType: '',
         },
+        wasNameChanged: false,
+        previousName: {
+          lastName: '',
+          firstName: '',
+        },
       },
       isNationalityOpen: false,
       citizenships,
@@ -209,6 +245,9 @@ export default {
     },
     isForeignNationality() {
       return !this.isRussianNationality && this.formData.nationality.length > 0;
+    },
+    wasNameChanged() {
+      return this.formData.wasNameChanged;
     },
   },
   methods: {
